@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  mysql:
+    build:
+      context: ./docker/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: R00tP@ssw0rd237!
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: P@ssw0rd123!
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --explicit_defaults_for_timestamp
+      - --max_allowed_packet=100M
+    networks:
+      - mysql
+    volumes:
+      - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:cached
+      - ./docker/mysql/mysql-data:/var/lib/mysql:cached
+    ports:
+      - 3306:3306
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    networks:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8183:80
+
+networks:
+  mysql:
